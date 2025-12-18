@@ -1,11 +1,8 @@
- package com.example.demo.service.impl;
+ package com.example.demo.service;
 
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.Category;
 import com.example.demo.model.CategorizationRule;
-import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.CategorizationRuleRepository;
-import com.example.demo.service.CategorizationRuleService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,46 +11,48 @@ import java.util.List;
 public class CategorizationRuleServiceImpl implements CategorizationRuleService {
 
     private final CategorizationRuleRepository ruleRepository;
-    private final CategoryRepository categoryRepository;
 
-    // ✅ Constructor Injection (MANDATORY)
-    public CategorizationRuleServiceImpl(CategorizationRuleRepository ruleRepository,
-                                         CategoryRepository categoryRepository) {
+    public CategorizationRuleServiceImpl(CategorizationRuleRepository ruleRepository) {
         this.ruleRepository = ruleRepository;
-        this.categoryRepository = categoryRepository;
     }
 
     @Override
-    public CategorizationRule createRule(Long categoryId, CategorizationRule rule) {
-
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-
-        if (rule.getKeyword() == null || rule.getKeyword().isBlank()) {
-            throw new IllegalArgumentException("Keyword must not be empty");
-        }
-
-        if (rule.getMatchType() == null || rule.getMatchType().isBlank()) {
-            throw new IllegalArgumentException("MatchType must not be empty");
-        }
-
-        if (rule.getPriority() == null) {
-            throw new IllegalArgumentException("Priority must not be null");
-        }
-
-        rule.setCategory(category);
+    public CategorizationRule saveRule(CategorizationRule rule) {
         return ruleRepository.save(rule);
     }
 
     @Override
-    public List<CategorizationRule> getRulesByCategory(Long categoryId) {
-        return ruleRepository.findByCategoryIdOrderByPriorityDesc(categoryId);
+    public List<CategorizationRule> getAllRules() {
+        return ruleRepository.findAll();
     }
 
     @Override
-    public void deleteRule(Long ruleId) {
-        CategorizationRule rule = ruleRepository.findById(ruleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Rule not found"));
+    public CategorizationRule getRuleById(Long id) {
+        return ruleRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Rule not found with id " + id));
+    }
+
+    @Override
+    public CategorizationRule updateRule(Long id, CategorizationRule rule) {
+
+        CategorizationRule existing = ruleRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Rule not found with id " + id));
+
+        existing.setKeyword(rule.getKeyword());
+        existing.setMatchType(rule.getMatchType());
+        existing.setPriority(rule.getPriority());
+        existing.setCategory(rule.getCategory());
+
+        return ruleRepository.save(existing);
+    }
+
+    @Override
+    public void deleteRule(Long id) {
+        CategorizationRule rule = ruleRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Rule not found with id " + id));
 
         ruleRepository.delete(rule);
     }
