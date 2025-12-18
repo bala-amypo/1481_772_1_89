@@ -1,6 +1,7 @@
  package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "categorization_rules")
@@ -10,39 +11,56 @@ public class CategorizationRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ruleName;
-    private String pattern;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @Column(nullable = false)
+    private String keyword;
+
+    @Column(nullable = false)
+    private String matchType; // EXACT, CONTAINS, REGEX
+
+    @Column(nullable = false)
     private Integer priority;
 
-    public CategorizationRule() {}
+    private LocalDateTime createdAt;
 
-    public CategorizationRule(String ruleName, String pattern, Integer priority) {
-        this.ruleName = ruleName;
-        this.pattern = pattern;
-        this.priority = priority;
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
+
+    public CategorizationRule() {}
 
     public Long getId() {
         return id;
     }
 
-    public String getRuleName() {
-        return ruleName;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public String getPattern() {
-        return pattern;
+    public String getKeyword() {
+        return keyword;
     }
 
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 
-    // 🔴 THIS WAS MISSING — NOW FIXED
+    public String getMatchType() {
+        return matchType;
+    }
+
+    public void setMatchType(String matchType) {
+        this.matchType = matchType;
+    }
+
     public Integer getPriority() {
         return priority;
     }
