@@ -4,15 +4,13 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categorization_rules")
 public class CategorizationRule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "category_id")
+    @ManyToOne
     private Category category;
 
     @Column(nullable = false)
@@ -24,14 +22,9 @@ public class CategorizationRule {
     @Column(nullable = false)
     private Integer priority;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public CategorizationRule() {}
+    // ✅ GETTERS & SETTERS
 
     public Long getId() {
         return id;
