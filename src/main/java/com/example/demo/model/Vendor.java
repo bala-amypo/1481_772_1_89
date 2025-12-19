@@ -1,4 +1,4 @@
-package com.example.demo.model;
+ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -9,12 +9,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(
-        name = "vendors",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "vendorName")
-        }
-)
+@Table(name = "vendors", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "vendorName")
+})
 public class Vendor {
 
     @Id
@@ -39,22 +36,12 @@ public class Vendor {
     @OneToMany(mappedBy = "vendor")
     private Set<Invoice> invoices = new HashSet<>();
 
-    public Vendor() {
-    }
-
-    public Vendor(Long id, String vendorName, String contactEmail, String address) {
-        this.id = id;
-        this.vendorName = vendorName;
-        this.contactEmail = contactEmail;
-        this.address = address;
-    }
+    public Vendor() {}
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
-
-    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -64,22 +51,22 @@ public class Vendor {
         return vendorName;
     }
 
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
     public String getContactEmail() {
         return contactEmail;
     }
-
+    
     public void setContactEmail(String contactEmail) {
         this.contactEmail = contactEmail;
     }
-
+    
     public String getAddress() {
         return address;
     }
@@ -90,21 +77,5 @@ public class Vendor {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
-
-    public Set<Invoice> getInvoices() {
-        return invoices;
-    }
-
-    public void setInvoices(Set<Invoice> invoices) {
-        this.invoices = invoices;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.demo.model;
+ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -9,12 +9,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "invoices",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"vendor_id", "invoiceNumber"})
-        }
-)
+@Table(name = "invoices", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"vendor_id", "invoiceNumber"})
+})
 public class Invoice {
 
     @Id
@@ -47,23 +44,12 @@ public class Invoice {
 
     private LocalDateTime uploadedAt;
 
-    public Invoice() {
-    }
-
-    public Invoice(Long id, Vendor vendor, String invoiceNumber, Double amount, LocalDate invoiceDate) {
-        this.id = id;
-        this.vendor = vendor;
-        this.invoiceNumber = invoiceNumber;
-        this.amount = amount;
-        this.invoiceDate = invoiceDate;
-    }
+    public Invoice() {}
 
     @PrePersist
     public void prePersist() {
         this.uploadedAt = LocalDateTime.now();
     }
-
-    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -100,7 +86,7 @@ public class Invoice {
     public LocalDate getInvoiceDate() {
         return invoiceDate;
     }
-
+    
     public void setInvoiceDate(LocalDate invoiceDate) {
         this.invoiceDate = invoiceDate;
     }
@@ -124,7 +110,7 @@ public class Invoice {
     public User getUploadedBy() {
         return uploadedBy;
     }
-
+    
     public void setUploadedBy(User uploadedBy) {
         this.uploadedBy = uploadedBy;
     }
