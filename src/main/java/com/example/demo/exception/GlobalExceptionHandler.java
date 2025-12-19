@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-public class GlobalException{
+public class GlobalExceptionHandler{
     @ExceptionHandler(ResourceNotFoundException.class)
     
     
