@@ -1,6 +1,7 @@
  package com.example.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,14 +12,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Full name is required")
     private String fullName;
+
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is required")
     private String email;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+
     private String role = "USER";
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Default constructor
     public User() {}
 
+    // Constructor with all fields except id and createdAt
     public User(String fullName, String email, String password, String role) {
         this.fullName = fullName;
         this.email = email;
