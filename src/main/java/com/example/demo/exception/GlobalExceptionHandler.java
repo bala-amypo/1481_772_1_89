@@ -1,4 +1,5 @@
 package com.example.demo.exception;
+import com.example.demo.exception.ApiError;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
