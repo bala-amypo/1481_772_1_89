@@ -9,3 +9,4 @@ public interface InvoiceService {
     List<Invoice> getInvoicesByUser(User user);
     Invoice getInvoiceById(Long id);
 }
+is
