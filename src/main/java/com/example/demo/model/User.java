@@ -1,5 +1,6 @@
  package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +22,8 @@ public class User {
     private String fullName;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email")
+    @Email(message = "Invalid email format")
+    @Column(unique = true)
     private String email;
 
     @NotBlank(message = "Password is required")
@@ -32,26 +34,24 @@ public class User {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Relationships (ignored for registration JSON)
     @ManyToMany
     @JoinTable(
-        name = "user_favorite_vendors",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "vendor_id")
+            name = "user_favorite_vendors",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "vendor_id")
     )
+    @JsonIgnore
     private Set<Vendor> favoriteVendors = new HashSet<>();
 
-    @OneToMany(mappedBy = "uploadedBy", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "uploadedBy")
+    @JsonIgnore
     private Set<Invoice> invoices = new HashSet<>();
 
+    // ✅ Default constructor
     public User() {}
 
-    public User(String fullName, String email, String password) {
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-    }
-
-    // Getters and Setters
+    // ✅ Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
