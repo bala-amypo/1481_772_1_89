@@ -9,53 +9,68 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email")
-})
+@Table(
+    name = "users",
+    uniqueConstraints = @UniqueConstraint(columnNames = "email")
+)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Full name must not be blank")
     private String fullName;
 
-    @Email
-    @NotBlank
-    @Column(unique = true)
+    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email must not be blank")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Password must not be blank")
     private String password;
 
-    private String role;
+    private String role = "USER";
 
     private LocalDateTime createdAt;
 
+    /* ================= RELATION ================= */
+
     @ManyToMany
     @JoinTable(
-            name = "user_vendor_favorites",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "vendor_id")
+        name = "user_favorite_vendors",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "vendor_id")
     )
     private Set<Vendor> favoriteVendors = new HashSet<>();
 
-    @OneToMany(mappedBy = "uploadedBy")
-    private Set<Invoice> invoices = new HashSet<>();
-
-    public User() {}
+    /* ================= JPA CALLBACK ================= */
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (this.role == null) {
-            this.role = "USER";
-        }
     }
+
+    /* ================= CONSTRUCTORS ================= */
+
+    public User() {
+    }
+
+    public User(Long id, String fullName, String email, String password, String role) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    /* ================= GETTERS & SETTERS ================= */
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFullName() {
@@ -66,34 +81,30 @@ public class User {
         this.fullName = fullName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getEmail() {
         return email;
     }
-    
+
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public String getPassword() {
         return password;
     }
-    
+ 
     public void setPassword(String password) {
         this.password = password;
     }
-    
+ 
     public String getRole() {
         return role;
     }
-    
+ 
     public void setRole(String role) {
         this.role = role;
     }
-
+ 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -104,13 +115,5 @@ public class User {
 
     public void setFavoriteVendors(Set<Vendor> favoriteVendors) {
         this.favoriteVendors = favoriteVendors;
-    }
-
-    public Set<Invoice> getInvoices() {
-        return invoices;
-    }
-
-    public void setInvoices(Set<Invoice> invoices) {
-        this.invoices = invoices;
     }
 }
