@@ -1,34 +1,43 @@
-package com.example.demo.controller;
-
-import com.example.demo.model.User;
-import com.example.demo.service.UserService;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
+ package com.example.demo.controller;
 
 import java.util.List;
 
-@Controller
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.model.User;
+import com.example.demo.service.UserService;
+
+@RestController
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
 
+    // constructor injection
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping
-    public User register(@Valid @RequestBody User user) {
+    /* ================= REGISTER USER ================= */
+
+    @PostMapping("/register")
+    public User registerUser(@Valid @RequestBody User user) {
         return userService.registerUser(user);
     }
 
-    @GetMapping("/{id}")
-    public User getById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    /* ================= GET ALL USERS ================= */
+
+    @GetMapping("/all")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
-    @GetMapping
-    public List<User> getAll() {
-        return userService.getAllUsers();
+    /* ================= GET USER BY ID ================= */
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 }

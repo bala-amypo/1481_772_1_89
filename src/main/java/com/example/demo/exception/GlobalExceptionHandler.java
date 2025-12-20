@@ -1,8 +1,9 @@
-package com.example.demo.exception;
+ package com.example.demo.exception;
 
-import com.example.demo.exception.ApiError;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,53 +13,70 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /* ================= RESOURCE NOT FOUND ================= */
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleResourceNotFound(
-            ResourceNotFoundException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(
+            ResourceNotFoundException ex) {
 
-        ApiError error = new ApiError(
-                HttpStatus.NOT_FOUND.value(),
-                "Not Found",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", "Not Found");
+        response.put("message", ex.getMessage());
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+
+    /* ================= VALIDATION ERRORS ================= */
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidationException(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(
+            MethodArgumentNotValidException ex) {
 
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .get(0)
-                .getDefaultMessage();
+        Map<String, Object> errors = new HashMap<>();
 
-        ApiError error = new ApiError(
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                message,
-                request.getRequestURI()
-        );
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error ->
+                        errors.put(error.getField(), error.getDefaultMessage())
+                );
 
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Validation Failed");
+        response.put("message", errors);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    /* ================= ILLEGAL ARGUMENT ================= */
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(
+            IllegalArgumentException ex) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Bad Request");
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /* ================= GENERIC EXCEPTION ================= */
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGenericException(
-            Exception ex,
-            HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleGenericException(
+            Exception ex) {
 
-        ApiError error = new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put("error", "Internal Server Error");
+        response.put("message", ex.getMessage());
 
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
