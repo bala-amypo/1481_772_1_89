@@ -1,48 +1,94 @@
  package com.example.demo.service.impl;
 
-import com.example.demo.entity.Invoice;
-import com.example.demo.entity.User;
-import com.example.demo.entity.Vendor;
-import com.example.demo.repository.InvoiceRepository;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.repository.VendorRepository;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
 import com.example.demo.service.InvoiceService;
+import com.example.demo.util.InvoiceCategorizationEngine;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
-    private final VendorRepository vendorRepository;
     private final UserRepository userRepository;
+    private final VendorRepository vendorRepository;
+    private final CategorizationRuleRepository ruleRepository;
+    private final InvoiceCategorizationEngine engine;
 
+    // CONSTRUCTOR INJECTION (MANDATORY)
     public InvoiceServiceImpl(
             InvoiceRepository invoiceRepository,
+            UserRepository userRepository,
             VendorRepository vendorRepository,
-            UserRepository userRepository) {
+            CategorizationRuleRepository ruleRepository,
+            InvoiceCategorizationEngine engine) {
+
         this.invoiceRepository = invoiceRepository;
-        this.vendorRepository = vendorRepository;
         this.userRepository = userRepository;
+        this.vendorRepository = vendorRepository;
+        this.ruleRepository = ruleRepository;
+        this.engine = engine;
     }
 
     @Override
-    public Invoice createInvoice(Invoice invoice, Long vendorId, Long userId) {
+    public Invoice uploadInvoice(Long userId, Long vendorId, Invoice invoice) {
 
-        Vendor vendor = vendorRepository.findById(vendorId)
-                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+        if (invoice.getAmount() <= 0) {
+            throw new RuntimeException("Amount must be greater than zero");
+        }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
-        invoiceRepository.findByVendorIdAndInvoiceNumber(
-                vendorId, invoice.getInvoiceNumber()
-        ).ifPresent(i -> {
-            throw new RuntimeException("Invoice number already exists for this vendor");
-        });
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Vendor not found"));
 
-        invoice.setVendor(vendor);
         invoice.setUploadedBy(user);
+        invoice.setVendor(vendor);
+        invoice.setCategory(null);
 
         return invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public Invoice categorizeInvoice(Long invoiceId) {
+
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Invoice not found"));
+
+        List<CategorizationRule> rules =
+                ruleRepository.findMatchingRulesByDescription(
+                        invoice.getDescription());
+
+        Category category =
+                engine.determineCategory(invoice, rules);
+
+        invoice.setCategory(category);
+
+        return invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public List<Invoice> getInvoicesByUser(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        return invoiceRepository.findByUploadedBy(user);
+    }
+
+    @Override
+    public Invoice getInvoice(Long invoiceId) {
+
+        return invoiceRepository.findById(invoiceId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Invoice not found"));
     }
 }
