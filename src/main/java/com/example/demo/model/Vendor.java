@@ -1,9 +1,9 @@
  package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,26 +20,22 @@ public class Vendor {
     private String vendorName;
 
     @NotBlank(message = "Contact email is required")
-    @Email(message = "Invalid contact email")
+    @Email(message = "Invalid email format")
     private String contactEmail;
 
     private String address;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Many-to-Many with Users (favoriteVendors)
     @ManyToMany(mappedBy = "favoriteVendors")
+    @JsonIgnore
     private Set<User> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
+    // One-to-Many with Invoice
+    @OneToMany(mappedBy = "vendor")
+    @JsonIgnore
     private Set<Invoice> invoices = new HashSet<>();
-
-    public Vendor() {}
-
-    public Vendor(String vendorName, String contactEmail, String address) {
-        this.vendorName = vendorName;
-        this.contactEmail = contactEmail;
-        this.address = address;
-    }
 
     // Getters and Setters
     public Long getId() { return id; }

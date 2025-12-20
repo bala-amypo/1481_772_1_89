@@ -1,13 +1,16 @@
-package com.example.demo.controller;
+ package com.example.demo.controller;
 
 import com.example.demo.entity.Vendor;
 import com.example.demo.service.VendorService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/vendors")
+@Tag(name = "Vendors Endpoints")
 public class VendorController {
 
     private final VendorService vendorService;
@@ -17,17 +20,18 @@ public class VendorController {
     }
 
     @PostMapping("/")
-    public Vendor createVendor(@RequestBody Vendor vendor) {
-        return vendorService.createVendor(vendor);
+    public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendor) {
+        Vendor createdVendor = vendorService.createVendor(vendor);
+        return ResponseEntity.ok(createdVendor);
     }
 
-    @GetMapping("/list")
-    public List<Vendor> getAllVendors() {
-        return vendorService.getAllVendors();
+    @GetMapping("/")
+    public ResponseEntity<List<Vendor>> getAllVendors() {
+        return ResponseEntity.ok(vendorService.getAllVendors());
     }
 
     @GetMapping("/{vendorId}")
-    public Vendor getVendor(@PathVariable Long vendorId) {
-        return vendorService.getVendor(vendorId);
+    public ResponseEntity<Vendor> getVendor(@PathVariable Long vendorId) {
+        return ResponseEntity.ok(vendorService.getVendor(vendorId));
     }
 }
