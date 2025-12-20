@@ -1,4 +1,4 @@
-package com.example.demo.model;
+ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -9,93 +9,57 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(
-    name = "vendors",
-    uniqueConstraints = @UniqueConstraint(columnNames = "vendorName")
-)
+@Table(name = "vendors", uniqueConstraints = @UniqueConstraint(columnNames = "vendorName"))
 public class Vendor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Vendor name must not be blank")
+    @NotBlank(message = "Vendor name is required")
     private String vendorName;
 
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "Contact email is required")
+    @Email(message = "Invalid contact email")
     private String contactEmail;
 
     private String address;
 
-    private LocalDateTime createdAt;
-
-    /* ================= RELATION ================= */
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToMany(mappedBy = "favoriteVendors")
     private Set<User> users = new HashSet<>();
 
-    /* ================= JPA CALLBACK ================= */
+    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL)
+    private Set<Invoice> invoices = new HashSet<>();
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
+    public Vendor() {}
 
-    /* ================= CONSTRUCTORS ================= */
-
-    public Vendor() {
-    }
-
-    public Vendor(Long id, String vendorName, String contactEmail, String address) {
-        this.id = id;
+    public Vendor(String vendorName, String contactEmail, String address) {
         this.vendorName = vendorName;
         this.contactEmail = contactEmail;
         this.address = address;
     }
 
-    /* ================= GETTERS & SETTERS ================= */
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getVendorName() { return vendorName; }
+    public void setVendorName(String vendorName) { this.vendorName = vendorName; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getContactEmail() { return contactEmail; }
+    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
 
-    public String getVendorName() {
-        return vendorName;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public String getContactEmail() {
-        return contactEmail;
-    }
+    public Set<User> getUsers() { return users; }
+    public void setUsers(Set<User> users) { this.users = users; }
 
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
+    public Set<Invoice> getInvoices() { return invoices; }
+    public void setInvoices(Set<Invoice> invoices) { this.invoices = invoices; }
 }

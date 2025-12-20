@@ -1,39 +1,36 @@
- package com.example.demo.model;
+ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(
-    name = "users",
-    uniqueConstraints = @UniqueConstraint(columnNames = "email")
-)
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Full name must not be blank")
+    @NotBlank(message = "Full name is required")
     private String fullName;
 
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email must not be blank")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email")
     private String email;
 
-    @NotBlank(message = "Password must not be blank")
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
     private String role = "USER";
 
-    private LocalDateTime createdAt;
-
-    /* ================= RELATION ================= */
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToMany
     @JoinTable(
@@ -43,77 +40,39 @@ public class User {
     )
     private Set<Vendor> favoriteVendors = new HashSet<>();
 
-    /* ================= JPA CALLBACK ================= */
+    @OneToMany(mappedBy = "uploadedBy", cascade = CascadeType.ALL)
+    private Set<Invoice> invoices = new HashSet<>();
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
+    public User() {}
 
-    /* ================= CONSTRUCTORS ================= */
-
-    public User() {
-    }
-
-    public User(Long id, String fullName, String email, String password, String role) {
-        this.id = id;
+    public User(String fullName, String email, String password) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
-        this.role = role;
     }
 
-    /* ================= GETTERS & SETTERS ================= */
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getFullName() {
-        return fullName;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public String getEmail() {
-        return email;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public Set<Vendor> getFavoriteVendors() { return favoriteVendors; }
+    public void setFavoriteVendors(Set<Vendor> favoriteVendors) { this.favoriteVendors = favoriteVendors; }
 
-    public String getPassword() {
-        return password;
-    }
- 
-    public void setPassword(String password) {
-        this.password = password;
-    }
- 
-    public String getRole() {
-        return role;
-    }
- 
-    public void setRole(String role) {
-        this.role = role;
-    }
- 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public Set<Vendor> getFavoriteVendors() {
-        return favoriteVendors;
-    }
-
-    public void setFavoriteVendors(Set<Vendor> favoriteVendors) {
-        this.favoriteVendors = favoriteVendors;
-    }
+    public Set<Invoice> getInvoices() { return invoices; }
+    public void setInvoices(Set<Invoice> invoices) { this.invoices = invoices; }
 }
