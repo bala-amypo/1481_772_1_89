@@ -13,7 +13,7 @@ public class CategorizationRule {
     private Long id;
 
     @NotBlank
-    private String ruleType;   // EXACT / CONTAINS / REGEX
+    private String ruleType; // EXACT / CONTAINS / REGEX
 
     @NotBlank
     private String pattern;
@@ -22,13 +22,13 @@ public class CategorizationRule {
     private Integer priority;
 
     @NotBlank
-    private String description; // 🔥 Add this field
+    private String description; // 🔹 Mandatory for repository query
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category category;
+    private Category category; // Relation with Category entity
 
-    // getters and setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
