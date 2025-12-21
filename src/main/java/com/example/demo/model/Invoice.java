@@ -54,7 +54,7 @@ public class Invoice {
 
     public Invoice() {}
 
-    // getters & setters
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

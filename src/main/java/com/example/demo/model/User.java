@@ -34,7 +34,7 @@ public class User {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Relationships (ignored for registration JSON)
+     
     @ManyToMany
     @JoinTable(
             name = "user_favorite_vendors",
@@ -48,10 +48,10 @@ public class User {
     @JsonIgnore
     private Set<Invoice> invoices = new HashSet<>();
 
-    // ✅ Default constructor
+     
     public User() {}
 
-    // ✅ Getters and Setters
+     
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

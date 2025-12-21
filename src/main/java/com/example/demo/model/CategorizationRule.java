@@ -13,10 +13,10 @@ public class CategorizationRule {
     private Long id;
 
     @NotBlank
-    private String ruleType; // 🔹 corresponds to getMatchType()
+    private String ruleType; 
 
     @NotBlank
-    private String pattern; // 🔹 corresponds to getKeyword()
+    private String pattern;  
 
     @NotNull
     private Integer priority;
@@ -28,7 +28,7 @@ public class CategorizationRule {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    // Getters and Setters
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -47,7 +47,6 @@ public class CategorizationRule {
     public Category getCategory() { return category; }
     public void setCategory(Category category) { this.category = category; }
 
-    // 🔹 Convenience methods for InvoiceCategorizationEngine
     public String getMatchType() { return this.ruleType; }
     public String getKeyword() { return this.pattern; }
 }
