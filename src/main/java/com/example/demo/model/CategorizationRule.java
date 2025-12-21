@@ -13,20 +13,20 @@ public class CategorizationRule {
     private Long id;
 
     @NotBlank
-    private String ruleType; // EXACT / CONTAINS / REGEX
+    private String ruleType; // 🔹 corresponds to getMatchType()
 
     @NotBlank
-    private String pattern;
+    private String pattern; // 🔹 corresponds to getKeyword()
 
     @NotNull
     private Integer priority;
 
     @NotBlank
-    private String description; // 🔹 Mandatory for repository query
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category category; // Relation with Category entity
+    private Category category;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -46,4 +46,8 @@ public class CategorizationRule {
 
     public Category getCategory() { return category; }
     public void setCategory(Category category) { this.category = category; }
+
+    // 🔹 Convenience methods for InvoiceCategorizationEngine
+    public String getMatchType() { return this.ruleType; }
+    public String getKeyword() { return this.pattern; }
 }
