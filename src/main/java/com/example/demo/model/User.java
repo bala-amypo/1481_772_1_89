@@ -33,8 +33,7 @@ public class User {
     private String role = "USER";
 
     private LocalDateTime createdAt = LocalDateTime.now();
-
-     
+ 
     @ManyToMany
     @JoinTable(
             name = "user_favorite_vendors",
@@ -48,7 +47,7 @@ public class User {
     @JsonIgnore
     private Set<Invoice> invoices = new HashSet<>();
 
-     
+    
     public User() {}
 
      
