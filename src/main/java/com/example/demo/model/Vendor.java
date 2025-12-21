@@ -27,17 +27,15 @@ public class Vendor {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Many-to-Many with Users (favoriteVendors)
+     
     @ManyToMany(mappedBy = "favoriteVendors")
     @JsonIgnore
     private Set<User> users = new HashSet<>();
-
-    // One-to-Many with Invoice
+ 
     @OneToMany(mappedBy = "vendor")
     @JsonIgnore
     private Set<Invoice> invoices = new HashSet<>();
-
-    // Getters and Setters
+ 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
