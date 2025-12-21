@@ -18,7 +18,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final CategorizationRuleRepository ruleRepository;
     private final InvoiceCategorizationEngine engine;
 
-    // CONSTRUCTOR INJECTION (MANDATORY)
+     //ci
     public InvoiceServiceImpl(
             InvoiceRepository invoiceRepository,
             UserRepository userRepository,
