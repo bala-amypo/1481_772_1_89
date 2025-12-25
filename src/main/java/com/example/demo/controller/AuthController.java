@@ -1,7 +1,7 @@
  package com.example.demo.controller;
 
 import com.example.demo.dto.AuthRequest;
-import com.example.demo.dto.LoginResponse;
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import com.example.demo.security.JwtUtil;
@@ -27,16 +27,16 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = userService.findByEmail(request.getEmail());
-        String token = jwtUtil.generateToken(user.getEmail());
+    User user = userService.findByEmail(request.getEmail());
+    UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
+    String token = jwtUtil.generateToken(userDetails, user);
 
-        return ResponseEntity.ok(new LoginResponse(token));
-    }
+    return ResponseEntity.ok(new AuthResponse(token));
 }
