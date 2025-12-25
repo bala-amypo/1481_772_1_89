@@ -1,3 +1,13 @@
+ package com.example.demo.controller;
+
+import com.example.demo.model.Invoice;
+import com.example.demo.service.InvoiceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+ 
+ 
  @RestController
 @RequestMapping("/api/invoices")
 @Tag(name = "Invoices Endpoints")

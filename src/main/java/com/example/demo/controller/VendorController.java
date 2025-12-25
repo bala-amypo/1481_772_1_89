@@ -1,5 +1,14 @@
+ package com.example.demo.controller;
+
+import com.example.demo.model.Vendor;
+import com.example.demo.service.VendorService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
  
- @RestController
+ 
+  @RestController
 @RequestMapping("/api/vendors")
 @Tag(name = "Vendors Endpoints")
 public class VendorController {
