@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,17 +29,28 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
 
+        // Authenticate user
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // Load user details
         User user = userService.findByEmail(request.getEmail());
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String token = jwtUtil.generateToken(userDetails, user);
+        // Generate JWT token (update JwtUtil.generateToken to accept User)
+        String token = jwtUtil.generateToken(authentication.getPrincipal(), user);
 
-        return ResponseEntity.ok(new AuthResponse(token, user.getId(), user.getEmail(), user.getFullName()));
+        // Return full AuthResponse
+        AuthResponse response = new AuthResponse(
+                token,
+                user.getId(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole() // Make sure User class has getRole()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
