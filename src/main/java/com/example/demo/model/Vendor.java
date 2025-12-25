@@ -1,43 +1,45 @@
  package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "vendors", uniqueConstraints = @UniqueConstraint(columnNames = "vendorName"))
+@Table(
+        name = "vendors",
+        uniqueConstraints = @UniqueConstraint(columnNames = "vendorName")
+)
 public class Vendor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Vendor name is required")
+    @NotBlank
     private String vendorName;
 
-    @NotBlank(message = "Contact email is required")
-    @Email(message = "Invalid email format")
+    @Email
+    @NotBlank
     private String contactEmail;
 
     private String address;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
-     
     @ManyToMany(mappedBy = "favoriteVendors")
-    @JsonIgnore
     private Set<User> users = new HashSet<>();
- 
-    @OneToMany(mappedBy = "vendor")
-    @JsonIgnore
-    private Set<Invoice> invoices = new HashSet<>();
- 
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // Getters & Setters
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public String getVendorName() { return vendorName; }
     public void setVendorName(String vendorName) { this.vendorName = vendorName; }
@@ -49,11 +51,6 @@ public class Vendor {
     public void setAddress(String address) { this.address = address; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public Set<User> getUsers() { return users; }
-    public void setUsers(Set<User> users) { this.users = users; }
-
-    public Set<Invoice> getInvoices() { return invoices; }
-    public void setInvoices(Set<Invoice> invoices) { this.invoices = invoices; }
 }
