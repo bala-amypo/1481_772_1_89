@@ -1,37 +1,26 @@
- package com.example.demo.controller;
-
-import com.example.demo.model.Vendor;
-import com.example.demo.service.VendorService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@RestController
+ @RestController
 @RequestMapping("/api/vendors")
 @Tag(name = "Vendors Endpoints")
 public class VendorController {
 
-    private final VendorService vendorService;
+    private final VendorService service;
 
-    public VendorController(VendorService vendorService) {
-        this.vendorService = vendorService;
+    public VendorController(VendorService service) {
+        this.service = service;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendor) {
-        Vendor createdVendor = vendorService.createVendor(vendor);
-        return ResponseEntity.ok(createdVendor);
+    @PostMapping
+    public Vendor create(@RequestBody Vendor v) {
+        return service.createVendor(v);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<Vendor>> getAllVendors() {
-        return ResponseEntity.ok(vendorService.getAllVendors());
+    @GetMapping
+    public List<Vendor> all() {
+        return service.getAllVendors();
     }
 
-    @GetMapping("/{vendorId}")
-    public ResponseEntity<Vendor> getVendor(@PathVariable Long vendorId) {
-        return ResponseEntity.ok(vendorService.getVendor(vendorId));
+    @GetMapping("/{id}")
+    public Vendor get(@PathVariable Long id) {
+        return service.getVendor(id);
     }
 }

@@ -1,10 +1,8 @@
  package com.example.demo.controller;
 
 import com.example.demo.model.User;
-import com.example.demo.service.UserService;
+import com.example.demo.repository.UserRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,24 +12,19 @@ import java.util.List;
 @Tag(name = "Users Endpoints")
 public class UserController {
 
-    private final UserService userService;
+    private final UserRepository repo;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
-        return ResponseEntity.ok(userService.registerUser(user));
+    public UserController(UserRepository repo) {
+        this.repo = repo;
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public List<User> all() {
+        return repo.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public User get(@PathVariable Long id) {
+        return repo.findById(id).orElseThrow();
     }
 }

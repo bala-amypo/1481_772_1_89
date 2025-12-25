@@ -1,36 +1,26 @@
-package com.example.demo.controller;
-
-import com.example.demo.model.Category;
-import com.example.demo.service.CategoryService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@RestController
+ @RestController
 @RequestMapping("/api/categories")
 @Tag(name = "Categories Endpoints")
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final CategoryService service;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public CategoryController(CategoryService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public Category create(@Valid @RequestBody Category category) {
-        return categoryService.createCategory(category);
+    public Category create(@RequestBody Category c) {
+        return service.createCategory(c);
     }
 
     @GetMapping
-    public List<Category> list() {
-        return categoryService.getAllCategories();
+    public List<Category> all() {
+        return service.getAllCategories();
     }
 
     @GetMapping("/{id}")
     public Category get(@PathVariable Long id) {
-        return categoryService.getCategory(id);
+        return service.getCategory(id);
     }
 }

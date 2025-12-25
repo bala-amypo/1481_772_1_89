@@ -1,39 +1,27 @@
-package com.example.demo.controller;
-
-import com.example.demo.model.CategorizationRule;
-import com.example.demo.service.CategorizationRuleService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@RestController
+ @RestController
 @RequestMapping("/api/rules")
 @Tag(name = "Categorization Rules Endpoints")
 public class CategorizationRuleController {
 
-    private final CategorizationRuleService ruleService;
+    private final CategorizationRuleService service;
 
-    public CategorizationRuleController(CategorizationRuleService ruleService) {
-        this.ruleService = ruleService;
+    public CategorizationRuleController(CategorizationRuleService service) {
+        this.service = service;
     }
 
-    @PostMapping("/category/{categoryId}")
-    public CategorizationRule createRule(
-            @PathVariable Long categoryId,
-            @Valid @RequestBody CategorizationRule rule) {
-
-        return ruleService.createRule(categoryId, rule);
+    @PostMapping("/category/{id}")
+    public CategorizationRule create(@PathVariable Long id,
+                                     @RequestBody CategorizationRule rule) {
+        return service.createRule(id, rule);
     }
 
-    @GetMapping("/category/{categoryId}")
-    public List<CategorizationRule> getRules(@PathVariable Long categoryId) {
-        return ruleService.getRulesByCategory(categoryId);
+    @GetMapping("/category/{id}")
+    public List<CategorizationRule> list(@PathVariable Long id) {
+        return service.getRulesByCategory(id);
     }
 
-    @DeleteMapping("/{ruleId}")
-    public void delete(@PathVariable Long ruleId) {
-        ruleService.deleteRule(ruleId);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.deleteRule(id);
     }
 }
