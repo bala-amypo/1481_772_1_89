@@ -1,60 +1,43 @@
- package com.example.demo.util;
+ package com.example.demo.service.impl;
 
+import com.example.demo.model.Invoice;
 import com.example.demo.model.CategorizationRule;
 import com.example.demo.model.Category;
-import com.example.demo.model.Invoice;
-import org.springframework.stereotype.Component;
+import com.example.demo.repository.InvoiceRepository;
+import com.example.demo.repository.CategorizationRuleRepository;
+import com.example.demo.service.InvoiceService;
+import com.example.demo.util.InvoiceCategorizationEngine;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
-@Component
-public class InvoiceCategorizationEngine {
+@Service
+public class InvoiceServiceImpl implements InvoiceService {
 
-    /**
-     * Apply rules in priority order and return matched Category
-     */
-    public Category categorize(Invoice invoice, List<CategorizationRule> rules) {
+    private final InvoiceRepository invoiceRepository;
+    private final CategorizationRuleRepository ruleRepository;
+    private final InvoiceCategorizationEngine engine = new InvoiceCategorizationEngine();
 
-        if (invoice == null || rules == null || rules.isEmpty()) {
-            return null;
-        }
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, CategorizationRuleRepository ruleRepository) {
+        this.invoiceRepository = invoiceRepository;
+        this.ruleRepository = ruleRepository;
+    }
 
-        // Text used for matching
-        String text = invoice.getDescription(); // make sure Invoice has getDescription()
-        if (text == null) {
-            return null;
-        }
+    @Override
+    public Invoice saveInvoice(Invoice invoice) {
+        List<CategorizationRule> rules = ruleRepository.findAllByOrderByPriorityAsc();
+        Category category = engine.categorize(invoice, rules);
+        invoice.setCategory(category);
+        return invoiceRepository.save(invoice);
+    }
 
-        for (CategorizationRule rule : rules) {
-            if (rule == null || rule.getPattern() == null) continue;
+    @Override
+    public Category categorizeInvoice(Invoice invoice, List<CategorizationRule> rules) {
+        return engine.categorize(invoice, rules);
+    }
 
-            String pattern = rule.getPattern();
-            String matchType = rule.getMatchType();
-
-            boolean matched = false;
-
-            switch (matchType) {
-                case "EXACT":
-                    matched = text.equalsIgnoreCase(pattern);
-                    break;
-                case "CONTAINS":
-                    matched = text.toLowerCase().contains(pattern.toLowerCase());
-                    break;
-                case "REGEX":
-                    matched = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
-                                     .matcher(text)
-                                     .find();
-                    break;
-                default:
-                    break;
-            }
-
-            if (matched) {
-                return rule.getCategory();
-            }
-        }
-
-        return null;
+    @Override
+    public List<Invoice> getInvoicesByUser(Long userId) {
+        return invoiceRepository.findByUserId(userId);
     }
 }
