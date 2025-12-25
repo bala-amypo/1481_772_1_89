@@ -1,8 +1,8 @@
  package com.example.demo.util;
 
+import com.example.demo.model.CategorizationRule;
 import com.example.demo.model.Category;
 import com.example.demo.model.Invoice;
-import com.example.demo.model.Rule;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,23 +14,20 @@ public class InvoiceCategorizationEngine {
     /**
      * Apply rules in priority order and return matched Category
      */
-    public Category categorize(Invoice invoice, List<Rule> rules) {
+    public Category categorize(Invoice invoice, List<CategorizationRule> rules) {
 
         if (invoice == null || rules == null || rules.isEmpty()) {
             return null;
         }
 
-        // 🔑 text used for matching
-        String text = invoice.getDescription();
+        // Text used for matching
+        String text = invoice.getDescription(); // make sure Invoice has getDescription()
         if (text == null) {
             return null;
         }
 
-        for (Rule rule : rules) {
-
-            if (rule == null || rule.getPattern() == null) {
-                continue;
-            }
+        for (CategorizationRule rule : rules) {
+            if (rule == null || rule.getPattern() == null) continue;
 
             String pattern = rule.getPattern();
             String matchType = rule.getMatchType();
@@ -41,19 +38,15 @@ public class InvoiceCategorizationEngine {
                 case "EXACT":
                     matched = text.equalsIgnoreCase(pattern);
                     break;
-
                 case "CONTAINS":
                     matched = text.toLowerCase().contains(pattern.toLowerCase());
                     break;
-
                 case "REGEX":
                     matched = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
                                      .matcher(text)
                                      .find();
                     break;
-
                 default:
-                    // unknown rule type – skip
                     break;
             }
 
