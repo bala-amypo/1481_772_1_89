@@ -6,7 +6,10 @@ public class AuthResponse {
 
     // Constructors
     public AuthResponse() {}
-    public AuthResponse(String token) { this.token = token; }
+
+    public AuthResponse(String token) {
+        this.token = token;
+    }
 
     // Getter & Setter
     public String getToken() { return token; }
