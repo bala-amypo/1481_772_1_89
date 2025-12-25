@@ -27,29 +27,31 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
 
-        // Authenticate user
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+    // Authenticate user
+    Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Load user
-        User user = userService.findByEmail(request.getEmail());
+    // Load user
+    User user = userService.findByEmail(request.getEmail());
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(authentication.getPrincipal(), user);
+    // Cast principal to UserDetails
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        // Return AuthResponse matching your test case
-        AuthResponse response = new AuthResponse(
-                token,
-                user.getId(),
-                user.getFullName(),
-                user.getRole()
-        );
+    // Generate JWT token
+    String token = jwtUtil.generateToken(userDetails, user);
 
-        return ResponseEntity.ok(response);
-    }
-} // <- make sure this closing brace is here
+    // Return AuthResponse
+    AuthResponse response = new AuthResponse(
+            token,
+            user.getId(),
+            user.getFullName(),
+            user.getRole()
+    );
+
+    return ResponseEntity.ok(response);
+}
