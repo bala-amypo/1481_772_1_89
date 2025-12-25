@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,20 +26,30 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-   @PostMapping("/login")
-public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
 
-    Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-    );
+        // Authenticate user
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
 
-    SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    User user = userService.findByEmail(request.getEmail());
-    String token = jwtUtil.generateToken(authentication.getPrincipal(), user);
+        // Load user
+        User user = userService.findByEmail(request.getEmail());
 
-    // Pass all required fields to AuthResponse constructor
-    AuthResponse response = new AuthResponse(token, user.getId(), user.getFullName(), user.getRole());
+        // Generate JWT token
+        String token = jwtUtil.generateToken(authentication.getPrincipal(), user);
 
-    return ResponseEntity.ok(response);
-}
+        // Return AuthResponse matching your test case
+        AuthResponse response = new AuthResponse(
+                token,
+                user.getId(),
+                user.getFullName(),
+                user.getRole()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+} // <- make sure this closing brace is here
