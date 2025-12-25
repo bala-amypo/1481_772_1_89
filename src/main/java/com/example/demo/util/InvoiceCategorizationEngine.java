@@ -2,13 +2,15 @@
 
 import com.example.demo.model.Invoice;
 import com.example.demo.model.CategorizationRule;
-import java.util.List;
 import org.springframework.stereotype.Component;
 
-@Component  // <-- This makes it a Spring Bean
+import java.util.List;
+
+@Component
 public class InvoiceCategorizationEngine {
 
-    public void applyRules(Invoice invoice, List<CategorizationRule> rules) {
+    // This method must exactly match the call in InvoiceServiceImpl
+    public void categorize(Invoice invoice, List<CategorizationRule> rules) {
         for (CategorizationRule rule : rules) {
             String type = rule.getRuleType();
             String pattern = rule.getPattern();
@@ -25,7 +27,7 @@ public class InvoiceCategorizationEngine {
 
             if (matched) {
                 invoice.setCategory(rule.getCategory());
-                break;  // first match wins
+                break;
             }
         }
     }
