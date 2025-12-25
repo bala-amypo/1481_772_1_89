@@ -18,14 +18,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final CategorizationRuleRepository ruleRepository;
     private final InvoiceCategorizationEngine engine;
 
-     //ci
-    public InvoiceServiceImpl(
-            InvoiceRepository invoiceRepository,
-            UserRepository userRepository,
-            VendorRepository vendorRepository,
-            CategorizationRuleRepository ruleRepository,
-            InvoiceCategorizationEngine engine) {
-
+    // Constructor Injection ONLY (order matters for tests)
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository,
+                              UserRepository userRepository,
+                              VendorRepository vendorRepository,
+                              CategorizationRuleRepository ruleRepository,
+                              InvoiceCategorizationEngine engine) {
         this.invoiceRepository = invoiceRepository;
         this.userRepository = userRepository;
         this.vendorRepository = vendorRepository;
@@ -36,10 +34,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Invoice uploadInvoice(Long userId, Long vendorId, Invoice invoice) {
 
-        if (invoice.getAmount() <= 0) {
-            throw new RuntimeException("Amount must be greater than zero");
-        }
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
@@ -47,6 +41,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Vendor not found"));
+
+        if (invoice.getAmount() <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than zero");
+        }
 
         invoice.setUploadedBy(user);
         invoice.setVendor(vendor);
@@ -66,9 +64,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 ruleRepository.findMatchingRulesByDescription(
                         invoice.getDescription());
 
-        Category category =
-                engine.determineCategory(invoice, rules);
-
+        Category category = engine.determineCategory(invoice, rules);
         invoice.setCategory(category);
 
         return invoiceRepository.save(invoice);
@@ -86,7 +82,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Invoice getInvoice(Long invoiceId) {
-
         return invoiceRepository.findById(invoiceId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Invoice not found"));
