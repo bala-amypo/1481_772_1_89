@@ -11,15 +11,22 @@ public class InvoiceCategorizationEngine {
 
     public void applyRules(Invoice invoice, List<CategorizationRule> rules) {
 
+        String text = invoice.getInvoiceDescription();
+
         for (CategorizationRule rule : rules) {
 
-            String text = invoice.getDescription();
+            String type = rule.getMatchType();   // EXACT / CONTAINS / REGEX
+            String keyword = rule.getKeyword();
 
-            boolean matched = switch (rule.getMatchType()) {
-                case EXACT -> text.equalsIgnoreCase(rule.getKeyword());
-                case CONTAINS -> text.toLowerCase().contains(rule.getKeyword().toLowerCase());
-                case REGEX -> text.matches(rule.getKeyword());
-            };
+            boolean matched = false;
+
+            if ("EXACT".equalsIgnoreCase(type)) {
+                matched = text.equalsIgnoreCase(keyword);
+            } else if ("CONTAINS".equalsIgnoreCase(type)) {
+                matched = text.toLowerCase().contains(keyword.toLowerCase());
+            } else if ("REGEX".equalsIgnoreCase(type)) {
+                matched = text.matches(keyword);
+            }
 
             if (matched) {
                 invoice.setCategory(rule.getCategory());
