@@ -4,28 +4,18 @@ public class AuthResponse {
 
     private String token;
     private Long userId;
-    private String email;
     private String fullName;
+    private String email;
     private String role;
 
-    // No-args constructor
     public AuthResponse() {
     }
 
-    // 4-args constructor (for your test case)
-    public AuthResponse(String token, Long userId, String email, String fullName) {
+    public AuthResponse(String token, Long userId, String fullName, String email, String role) {
         this.token = token;
         this.userId = userId;
-        this.email = email;
         this.fullName = fullName;
-    }
-
-    // 5-args constructor (for AuthController with role)
-    public AuthResponse(String token, Long userId, String email, String fullName, String role) {
-        this.token = token;
-        this.userId = userId;
         this.email = email;
-        this.fullName = fullName;
         this.role = role;
     }
 
@@ -38,19 +28,19 @@ public class AuthResponse {
         return userId;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public String getFullName() {
         return fullName;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getRole() {
         return role;
     }
 
-    // Setters (optional, if needed)
+    // Setters (if needed)
     public void setToken(String token) {
         this.token = token;
     }
@@ -59,12 +49,12 @@ public class AuthResponse {
         this.userId = userId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setRole(String role) {

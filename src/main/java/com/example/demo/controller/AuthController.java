@@ -1,16 +1,13 @@
  package com.example.demo.controller;
 
-import com.example.demo.dto.AuthRequest;
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.model.User;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,41 +18,20 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    @Autowired
+    private UserService userService;
 
-        // Authenticate
-        Authentication authentication = authenticationManager.authenticate(
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody AuthRequest request) {
+        Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        // Load user
         User user = userService.findByEmail(request.getEmail());
+        String token = jwtUtil.generateToken(auth.getPrincipal(), user);
 
-        // Ensure principal is cast to UserDetails safely
-        UserDetails userDetails;
-        if (authentication.getPrincipal() instanceof UserDetails) {
-            userDetails = (UserDetails) authentication.getPrincipal();
-        } else {
-            throw new RuntimeException("Authentication principal is not UserDetails");
-        }
-
-        // Generate JWT token
-        String token = jwtUtil.generateToken(userDetails, user);
-
-        // Prepare response
-        AuthResponse response = new AuthResponse(
-                token,
-                user.getId(),
-                user.getFullName(),
-                user.getRole()
-        );
-
-        return ResponseEntity.ok(response);
+        return new AuthResponse(token, user.getId(), user.getFullName(), user.getEmail(), user.getRole());
     }
-} // <-- Make sure this closing brace is present
+}
