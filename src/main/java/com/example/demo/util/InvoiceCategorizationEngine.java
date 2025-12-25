@@ -9,12 +9,11 @@ import java.util.List;
 public class InvoiceCategorizationEngine {
 
     public Category categorize(Invoice invoice, List<Rule> rules) {
-        // Example logic: return first matching category
         for (Rule rule : rules) {
-            if (rule.matches(invoice.getDescription())) { // implement matches() in Rule
+            if (rule.matches(invoice.getDescription())) {
                 return rule.getCategory();
             }
         }
-        return null; // or default category
+        return null; // default if no rule matches
     }
 }

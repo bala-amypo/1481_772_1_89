@@ -9,5 +9,9 @@ public interface InvoiceService {
 
     void categorizeInvoice(Invoice invoice, List<Rule> rules);
 
-    Invoice getInvoice(Long id); // Make sure this exists
+    Invoice getInvoice(Long id);
+
+    Invoice uploadInvoice(Long userId, Long vendorId, Invoice invoice);
+
+    List<Invoice> getInvoicesByUser(Long userId);
 }

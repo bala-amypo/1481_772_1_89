@@ -7,12 +7,16 @@ import com.example.demo.service.InvoiceService;
 import com.example.demo.util.InvoiceCategorizationEngine;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceCategorizationEngine categorizationEngine;
+
+    // In-memory storage
+    private final List<Invoice> invoiceStore = new ArrayList<>();
 
     public InvoiceServiceImpl(InvoiceCategorizationEngine categorizationEngine) {
         this.categorizationEngine = categorizationEngine;
@@ -22,13 +26,29 @@ public class InvoiceServiceImpl implements InvoiceService {
     public void categorizeInvoice(Invoice invoice, List<Rule> rules) {
         Category category = categorizationEngine.categorize(invoice, rules);
         invoice.setCategory(category);
-        // Save to DB if you have a repository
     }
 
     @Override
     public Invoice getInvoice(Long id) {
-        // Implement fetching logic, e.g., from a repository
-        // return invoiceRepository.findById(id).orElse(null);
-        return null; // placeholder if no repository yet
+        return invoiceStore.stream().filter(i -> i.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Invoice uploadInvoice(Long userId, Long vendorId, Invoice invoice) {
+        invoice.setUserId(userId);
+        invoice.setVendorId(vendorId);
+        invoiceStore.add(invoice);
+        return invoice;
+    }
+
+    @Override
+    public List<Invoice> getInvoicesByUser(Long userId) {
+        List<Invoice> result = new ArrayList<>();
+        for (Invoice i : invoiceStore) {
+            if (i.getUserId().equals(userId)) {
+                result.add(i);
+            }
+        }
+        return result;
     }
 }
