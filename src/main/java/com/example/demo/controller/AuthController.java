@@ -3,8 +3,8 @@
 import com.example.demo.dto.AuthRequest;
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.model.User;
-import com.example.demo.service.UserService;
 import com.example.demo.security.JwtUtil;
+import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,16 +27,19 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-    Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-    );
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
 
-    SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Authenticate user
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
 
-    User user = userService.findByEmail(request.getEmail());
-    UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
-    String token = jwtUtil.generateToken(userDetails, user);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    return ResponseEntity.ok(new AuthResponse(token));
+        // Load user details
+        User user = userService.findByEmail(request.getEmail());
+        String token = jwtUtil.generateToken(user);
+
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
 }
