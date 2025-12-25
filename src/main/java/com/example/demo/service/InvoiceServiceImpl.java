@@ -1,7 +1,9 @@
  package com.example.demo.service.impl;
 
 import com.example.demo.model.Invoice;
+import com.example.demo.model.Rule;
 import com.example.demo.repository.InvoiceRepository;
+import com.example.demo.repository.RuleRepository;
 import com.example.demo.service.InvoiceService;
 import com.example.demo.util.InvoiceCategorizationEngine;
 import org.springframework.stereotype.Service;
@@ -12,32 +14,38 @@ import java.util.List;
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final RuleRepository ruleRepository;
     private final InvoiceCategorizationEngine categorizationEngine;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository,
-                              InvoiceCategorizationEngine categorizationEngine) {
+    public InvoiceServiceImpl(
+            InvoiceRepository invoiceRepository,
+            RuleRepository ruleRepository,
+            InvoiceCategorizationEngine categorizationEngine) {
         this.invoiceRepository = invoiceRepository;
+        this.ruleRepository = ruleRepository;
         this.categorizationEngine = categorizationEngine;
     }
 
     @Override
     public Invoice uploadInvoice(Long userId, Long vendorId, Invoice invoice) {
-        invoice.setUserId(userId);
-        invoice.setVendorId(vendorId);
+        // user & vendor already mapped as entity in Invoice
         return invoiceRepository.save(invoice);
     }
 
     @Override
     public Invoice categorizeInvoice(Long invoiceId) {
-        Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+        Invoice invoice = getInvoice(invoiceId);
 
-        categorizationEngine.categorize(invoice);
+        List<Rule> rules = ruleRepository.findAllByOrderByPriorityAsc();
+
+        categorizationEngine.applyRules(invoice, rules);
+
         return invoiceRepository.save(invoice);
     }
 
     @Override
-    public List<Invoice> getInvoicesByUser(Long userId) {
-        return invoiceRepository.findByUserId(userId);
+    public Invoice getInvoice(Long invoiceId) {
+        return invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 }
