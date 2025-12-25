@@ -5,7 +5,7 @@ import com.example.demo.model.Invoice;
 import com.example.demo.model.Category;
 
 import java.util.List;
-
+@Component
 public class InvoiceCategorizationEngine {
 
     public void categorize(Invoice invoice, List<CategorizationRule> rules) {
