@@ -6,6 +6,7 @@ import com.example.demo.model.User;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,22 +21,31 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
     private UserService userService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request) {
-        Authentication auth = authenticationManager.authenticate(
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+
+        // Authenticate user
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        // Get UserDetails from Spring Security
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        // Load User entity from database
         User user = userService.findByEmail(request.getEmail());
 
+        // Generate JWT token
         String token = jwtUtil.generateToken(userDetails, user);
 
-        return new AuthResponse(token, user.getId(), user.getFullName(), user.getEmail(), user.getRole());
+        // Use the 4-parameter constructor expected by tests
+        AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getFullName());
+
+        return ResponseEntity.ok(response);
     }
 }
