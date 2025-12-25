@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,21 +33,19 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // Load user details
+        // Load user
         User user = userService.findByEmail(request.getEmail());
 
-        // Generate JWT token (update JwtUtil.generateToken to accept User)
-        String token = jwtUtil.generateToken(authentication.getPrincipal(), user);
+        // Generate JWT token
+        String token = jwtUtil.generateToken(user);  // make sure JwtUtil has this method
 
-        // Return full AuthResponse
+        // Build response
         AuthResponse response = new AuthResponse(
                 token,
                 user.getId(),
                 user.getEmail(),
                 user.getFullName(),
-                user.getRole() // Make sure User class has getRole()
+                user.getRole()
         );
 
         return ResponseEntity.ok(response);
