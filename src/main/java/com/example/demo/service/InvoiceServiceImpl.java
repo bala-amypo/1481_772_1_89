@@ -35,7 +35,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Invoice categorizeInvoice(Long invoiceId) {
         Invoice invoice = getInvoice(invoiceId);
 
-        engine.applyRules(invoice, ruleRepository.findAll());
+        engine.categorize(invoice, ruleRepository.findAll());
 
         return invoiceRepository.save(invoice);
     }
