@@ -25,20 +25,28 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return userService.registerUser(user);
-    }
+     @PostMapping("/login")
+public AuthResponse login(@RequestBody AuthRequest request) {
 
-    @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request) {
+    authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()));
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()));
+    User user = userService.findByEmail(request.getEmail());
 
-        String token = jwtUtil.generateToken(request.getEmail());
-        return new AuthResponse(token);
-    }
+    String token = jwtUtil.generateToken(
+            new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                List.of()), // authorities
+            user
+    );
+
+    return new AuthResponse(
+            token,
+            user.getId(),
+            user.getEmail(),
+            user.getRole()
+    );
 }
