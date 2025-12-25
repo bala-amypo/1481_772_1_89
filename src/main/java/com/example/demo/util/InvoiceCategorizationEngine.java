@@ -1,32 +1,31 @@
  package com.example.demo.util;
 
-import com.example.demo.model.CategorizationRule;
 import com.example.demo.model.Invoice;
-import com.example.demo.model.Category;
-
+import com.example.demo.model.CategorizationRule;
 import java.util.List;
- 
+import org.springframework.stereotype.Component;
+
+@Component  // <-- This makes it a Spring Bean
 public class InvoiceCategorizationEngine {
 
-    public void categorize(Invoice invoice, List<CategorizationRule> rules) {
-        String description = invoice.getDescription();
-
+    public void applyRules(Invoice invoice, List<CategorizationRule> rules) {
         for (CategorizationRule rule : rules) {
-            String pattern = rule.getPattern();
             String type = rule.getRuleType();
+            String pattern = rule.getPattern();
+            String description = invoice.getDescription();
 
-            boolean match = false;
+            boolean matched = false;
             if ("EXACT".equalsIgnoreCase(type)) {
-                match = description.equalsIgnoreCase(pattern);
+                matched = description.equals(pattern);
             } else if ("CONTAINS".equalsIgnoreCase(type)) {
-                match = description.contains(pattern);
+                matched = description.contains(pattern);
             } else if ("REGEX".equalsIgnoreCase(type)) {
-                match = description.matches(pattern);
+                matched = description.matches(pattern);
             }
 
-            if (match) {
+            if (matched) {
                 invoice.setCategory(rule.getCategory());
-                break; // Stop at first matching rule
+                break;  // first match wins
             }
         }
     }
