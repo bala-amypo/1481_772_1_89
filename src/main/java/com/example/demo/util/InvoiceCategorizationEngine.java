@@ -1,43 +1,33 @@
- package com.example.demo.service.impl;
+ package com.example.demo.util;
 
-import com.example.demo.model.Invoice;
 import com.example.demo.model.CategorizationRule;
+import com.example.demo.model.Invoice;
 import com.example.demo.model.Category;
-import com.example.demo.repository.InvoiceRepository;
-import com.example.demo.repository.CategorizationRuleRepository;
-import com.example.demo.service.InvoiceService;
-import com.example.demo.util.InvoiceCategorizationEngine;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public class InvoiceServiceImpl implements InvoiceService {
+public class InvoiceCategorizationEngine {
 
-    private final InvoiceRepository invoiceRepository;
-    private final CategorizationRuleRepository ruleRepository;
-    private final InvoiceCategorizationEngine engine = new InvoiceCategorizationEngine();
+    public void categorize(Invoice invoice, List<CategorizationRule> rules) {
+        String description = invoice.getDescription();
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, CategorizationRuleRepository ruleRepository) {
-        this.invoiceRepository = invoiceRepository;
-        this.ruleRepository = ruleRepository;
-    }
+        for (CategorizationRule rule : rules) {
+            String pattern = rule.getPattern();
+            String type = rule.getRuleType();
 
-    @Override
-    public Invoice saveInvoice(Invoice invoice) {
-        List<CategorizationRule> rules = ruleRepository.findAllByOrderByPriorityAsc();
-        Category category = engine.categorize(invoice, rules);
-        invoice.setCategory(category);
-        return invoiceRepository.save(invoice);
-    }
+            boolean match = false;
+            if ("EXACT".equalsIgnoreCase(type)) {
+                match = description.equalsIgnoreCase(pattern);
+            } else if ("CONTAINS".equalsIgnoreCase(type)) {
+                match = description.contains(pattern);
+            } else if ("REGEX".equalsIgnoreCase(type)) {
+                match = description.matches(pattern);
+            }
 
-    @Override
-    public Category categorizeInvoice(Invoice invoice, List<CategorizationRule> rules) {
-        return engine.categorize(invoice, rules);
-    }
-
-    @Override
-    public List<Invoice> getInvoicesByUser(Long userId) {
-        return invoiceRepository.findByUserId(userId);
+            if (match) {
+                invoice.setCategory(rule.getCategory());
+                break; // Stop at first matching rule
+            }
+        }
     }
 }
