@@ -1,5 +1,6 @@
  package com.example.demo.controller;
 
+import com.example.demo.dto.AuthRequest;
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.model.User;
 import com.example.demo.security.JwtUtil;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,8 +31,10 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
         User user = userService.findByEmail(request.getEmail());
-        String token = jwtUtil.generateToken(auth.getPrincipal(), user);
+
+        String token = jwtUtil.generateToken(userDetails, user);
 
         return new AuthResponse(token, user.getId(), user.getFullName(), user.getEmail(), user.getRole());
     }
