@@ -26,26 +26,20 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+   @PostMapping("/login")
+public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
 
-        // Authenticate user
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+    Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    );
 
-        // Get UserDetails from Spring Security
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Load User entity from database
-        User user = userService.findByEmail(request.getEmail());
+    User user = userService.findByEmail(request.getEmail());
+    String token = jwtUtil.generateToken(authentication.getPrincipal(), user);
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(userDetails, user);
+    // Pass all required fields to AuthResponse constructor
+    AuthResponse response = new AuthResponse(token, user.getId(), user.getFullName(), user.getRole());
 
-        // Use the 4-parameter constructor expected by tests
-        AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getFullName());
-
-        return ResponseEntity.ok(response);
-    }
+    return ResponseEntity.ok(response);
 }
