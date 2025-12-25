@@ -10,10 +10,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-    name = "invoices",
-    uniqueConstraints = @UniqueConstraint(
-        columnNames = {"invoice_number", "vendor_id"}
-    )
+        name = "invoices",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"vendor_id", "invoiceNumber"})
 )
 public class Invoice {
 
@@ -25,12 +23,11 @@ public class Invoice {
     @JoinColumn(name = "vendor_id", nullable = false)
     private Vendor vendor;
 
-    @NotBlank(message = "Invoice number is required")
-    @Column(name = "invoice_number")
+    @NotBlank
     private String invoiceNumber;
 
     @NotNull
-    @Positive(message = "Amount must be greater than 0")
+    @Positive
     private Double amount;
 
     private LocalDate invoiceDate;
@@ -39,24 +36,21 @@ public class Invoice {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category category; // initially null
+    private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "uploaded_by", nullable = false)
+    @JoinColumn(name = "uploaded_by_id", nullable = false)
     private User uploadedBy;
 
     private LocalDateTime uploadedAt;
 
     @PrePersist
-    public void onCreate() {
+    public void prePersist() {
         this.uploadedAt = LocalDateTime.now();
     }
 
-    public Invoice() {}
-
-    
+    // Getters & Setters
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public Vendor getVendor() { return vendor; }
     public void setVendor(Vendor vendor) { this.vendor = vendor; }

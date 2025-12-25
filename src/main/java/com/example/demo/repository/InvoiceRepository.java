@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
+    // REQUIRED by test cases
     List<Invoice> findByUploadedBy(User user);
 
-    @Query("SELECT i FROM Invoice i WHERE i.amount > ?1")
+    // REQUIRED exact name (HQL based test)
+    @Query("SELECT i FROM Invoice i WHERE i.amount > :amount")
     List<Invoice> findByAmountGreaterThanHql(Double amount);
 }
