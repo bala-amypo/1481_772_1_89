@@ -3,20 +3,18 @@
 public class AuthResponse {
 
     private String token;
-    private Long userId;
+    private long userId;
     private String email;
     private String fullName;
-    private String role;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(String token, Long userId, String email, String fullName, String role) {
+    public AuthResponse(String token, long userId, String email, String fullName) {
         this.token = token;
         this.userId = userId;
         this.email = email;
         this.fullName = fullName;
-        this.role = role;
     }
 
     // Getters and Setters
@@ -28,11 +26,11 @@ public class AuthResponse {
         this.token = token;
     }
 
-    public Long getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
@@ -50,13 +48,5 @@ public class AuthResponse {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }

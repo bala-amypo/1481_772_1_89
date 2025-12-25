@@ -34,7 +34,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        // Get UserDetails from Spring Security authentication
+        // Get UserDetails from Spring Security
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         // Load User entity from database
@@ -43,9 +43,8 @@ public class AuthController {
         // Generate JWT token
         String token = jwtUtil.generateToken(userDetails, user);
 
-        // Return AuthResponse
-        AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(),
-                user.getFullName(), user.getRole());
+        // Use the 4-parameter constructor expected by tests
+        AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getFullName());
 
         return ResponseEntity.ok(response);
     }
