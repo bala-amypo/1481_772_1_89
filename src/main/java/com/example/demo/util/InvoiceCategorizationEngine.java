@@ -1,37 +1,67 @@
  package com.example.demo.util;
 
-import com.example.demo.model.CategorizationRule;
+import com.example.demo.model.Category;
 import com.example.demo.model.Invoice;
+import com.example.demo.model.Rule;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class InvoiceCategorizationEngine {
 
-    public void applyRules(Invoice invoice, List<CategorizationRule> rules) {
+    /**
+     * Apply rules in priority order and return matched Category
+     */
+    public Category categorize(Invoice invoice, List<Rule> rules) {
 
-        String text = invoice.getInvoiceDescription();
+        if (invoice == null || rules == null || rules.isEmpty()) {
+            return null;
+        }
 
-        for (CategorizationRule rule : rules) {
+        // 🔑 text used for matching
+        String text = invoice.getDescription();
+        if (text == null) {
+            return null;
+        }
 
-            String type = rule.getMatchType();   // EXACT / CONTAINS / REGEX
-            String keyword = rule.getKeyword();
+        for (Rule rule : rules) {
+
+            if (rule == null || rule.getPattern() == null) {
+                continue;
+            }
+
+            String pattern = rule.getPattern();
+            String matchType = rule.getMatchType();
 
             boolean matched = false;
 
-            if ("EXACT".equalsIgnoreCase(type)) {
-                matched = text.equalsIgnoreCase(keyword);
-            } else if ("CONTAINS".equalsIgnoreCase(type)) {
-                matched = text.toLowerCase().contains(keyword.toLowerCase());
-            } else if ("REGEX".equalsIgnoreCase(type)) {
-                matched = text.matches(keyword);
+            switch (matchType) {
+                case "EXACT":
+                    matched = text.equalsIgnoreCase(pattern);
+                    break;
+
+                case "CONTAINS":
+                    matched = text.toLowerCase().contains(pattern.toLowerCase());
+                    break;
+
+                case "REGEX":
+                    matched = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
+                                     .matcher(text)
+                                     .find();
+                    break;
+
+                default:
+                    // unknown rule type – skip
+                    break;
             }
 
             if (matched) {
-                invoice.setCategory(rule.getCategory());
-                break;
+                return rule.getCategory();
             }
         }
+
+        return null;
     }
 }

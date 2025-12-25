@@ -18,6 +18,10 @@ public class Invoice {
     private BigDecimal amount;
     private LocalDate invoiceDate;
 
+    // 🔥 IMPORTANT: text used for categorization
+    @Column(length = 1000)
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
@@ -62,6 +66,15 @@ public class Invoice {
 
     public void setInvoiceDate(LocalDate invoiceDate) {
         this.invoiceDate = invoiceDate;
+    }
+
+    // 🔥 REQUIRED BY ENGINE & TESTS
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Category getCategory() {
