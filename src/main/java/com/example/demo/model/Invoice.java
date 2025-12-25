@@ -1,4 +1,4 @@
- package com.example.demo.model;
+ package com.example.demo.model.Invoice;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
