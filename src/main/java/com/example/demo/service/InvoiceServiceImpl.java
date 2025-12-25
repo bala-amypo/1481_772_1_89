@@ -8,7 +8,7 @@ import com.example.demo.util.InvoiceCategorizationEngine;
 import java.util.List;
 
  
-
+@Service
 public class InvoiceServiceImpl {
 
     public void categorizeInvoice(Invoice invoice, List<Rule> rules) {
