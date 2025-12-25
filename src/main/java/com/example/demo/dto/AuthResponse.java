@@ -1,33 +1,51 @@
  package com.example.demo.dto;
 
 public class AuthResponse {
-
     private String token;
-    private long userId;
+    private long id;
     private String email;
-    private String role;
+    private String fullName;
 
-    // Default constructor
     public AuthResponse() {}
 
-    // Constructor for 4 args
-    public AuthResponse(String token, long userId, String email, String role) {
+    // Constructor for full response
+    public AuthResponse(String token, long id, String email, String fullName) {
         this.token = token;
-        this.userId = userId;
+        this.id = id;
         this.email = email;
-        this.role = role;
+        this.fullName = fullName;
     }
 
-    // Getters & Setters
-    public String getToken() { return token; }
-    public void setToken(String token) { this.token = token; }
+    // Getters and setters
+    public String getToken() {
+        return token;
+    }
 
-    public long getUserId() { return userId; }
-    public void setUserId(long userId) { this.userId = userId; }
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public long getId() {
+        return id;
+    }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 }
