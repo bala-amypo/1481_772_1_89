@@ -14,20 +14,21 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceCategorizationEngine categorizationEngine;
 
-    // Constructor injection
     public InvoiceServiceImpl(InvoiceCategorizationEngine categorizationEngine) {
         this.categorizationEngine = categorizationEngine;
     }
 
     @Override
     public void categorizeInvoice(Invoice invoice, List<Rule> rules) {
-        // Use InvoiceCategorizationEngine to find category
         Category category = categorizationEngine.categorize(invoice, rules);
-
-        // Set the category to the invoice
         invoice.setCategory(category);
+        // Save to DB if you have a repository
+    }
 
-        // You can add logic to save the invoice if you have a repository
-        // e.g., invoiceRepository.save(invoice);
+    @Override
+    public Invoice getInvoice(Long id) {
+        // Implement fetching logic, e.g., from a repository
+        // return invoiceRepository.findById(id).orElse(null);
+        return null; // placeholder if no repository yet
     }
 }

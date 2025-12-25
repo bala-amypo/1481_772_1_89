@@ -1,16 +1,13 @@
  package com.example.demo.service;
 
 import com.example.demo.model.Invoice;
+import com.example.demo.model.Rule;
 
 import java.util.List;
 
 public interface InvoiceService {
 
-    Invoice uploadInvoice(Long userId, Long vendorId, Invoice invoice);
+    void categorizeInvoice(Invoice invoice, List<Rule> rules);
 
-    Invoice categorizeInvoice(Long invoiceId);
-
-    List<Invoice> getInvoicesByUser(Long userId);
-
-    Invoice getInvoice(Long invoiceId);
+    Invoice getInvoice(Long id); // Make sure this exists
 }
