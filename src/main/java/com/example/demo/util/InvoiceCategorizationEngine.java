@@ -1,9 +1,6 @@
  package com.example.demo.util;
 
-import com.example.demo.model.CategorizationRule;
-import com.example.demo.model.Category;
-import com.example.demo.model.Invoice;
-import com.example.demo.model.MatchType;
+import com.example.demo.model.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -12,24 +9,35 @@ import java.util.List;
 @Component
 public class InvoiceCategorizationEngine {
 
-    public Category determineCategory(Invoice invoice, List<CategorizationRule> rules) {
+    public Category determineCategory(
+            Invoice invoice,
+            List<CategorizationRule> rules) {
+
+        String description = invoice.getDescription().toLowerCase();
 
         return rules.stream()
-                .sorted(Comparator.comparingInt(CategorizationRule::getPriority))
-                .filter(rule -> matches(rule, invoice.getDescription()))
+                .sorted(Comparator.comparing(CategorizationRule::getPriority).reversed())
+                .filter(rule -> matchesRule(description, rule))
                 .map(CategorizationRule::getCategory)
                 .findFirst()
                 .orElse(null);
     }
 
-    private boolean matches(CategorizationRule rule, String description) {
+    private boolean matchesRule(String description, CategorizationRule rule) {
+        String keyword = rule.getKeyword().toLowerCase();
 
-        if (description == null) return false;
+        switch (rule.getMatchType()) {
+            case EXACT:
+                return description.equals(keyword);
 
-        return switch (rule.getMatchType()) {
-            case EXACT -> description.equalsIgnoreCase(rule.getKeyword());
-            case CONTAINS -> description.toLowerCase().contains(rule.getKeyword().toLowerCase());
-            case REGEX -> description.matches(rule.getKeyword());
-        };
+            case CONTAINS:
+                return description.contains(keyword);
+
+            case REGEX:
+                return description.matches(keyword);
+
+            default:
+                return false;
+        }
     }
 }
