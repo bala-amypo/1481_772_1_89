@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service  // 👈 MUST HAVE @Service annotation
+@Service
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
@@ -22,12 +22,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<Invoice> getAllInvoices() {
-        return invoiceRepository.findAll();
-    }
-
-    @Override
-    public Invoice getInvoiceById(Long id) {
-        return invoiceRepository.findById(id).orElse(null);
+    public List<Invoice> getInvoicesByUserId(Long userId) {
+        return invoiceRepository.findByUser_Id(userId);
     }
 }
