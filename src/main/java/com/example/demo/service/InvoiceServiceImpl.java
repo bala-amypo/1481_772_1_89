@@ -1,7 +1,7 @@
  package com.example.demo.service.impl;
 
-import com.example.demo.entity.CategorizationRule;
-import com.example.demo.entity.Invoice;
+import com.example.demo.model.CategorizationRule;
+import com.example.demo.model.Invoice;
 import com.example.demo.repository.CategorizationRuleRepository;
 import com.example.demo.repository.InvoiceRepository;
 import com.example.demo.service.InvoiceService;

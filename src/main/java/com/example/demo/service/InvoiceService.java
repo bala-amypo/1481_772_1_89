@@ -1,6 +1,6 @@
  package com.example.demo.service;
 
-import com.example.demo.entity.Invoice;
+import com.example.demo.model.Invoice;
 
 import java.util.List;
 

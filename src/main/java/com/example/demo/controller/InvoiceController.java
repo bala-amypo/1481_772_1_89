@@ -1,6 +1,6 @@
  package com.example.demo.controller;
 
-import com.example.demo.entity.Invoice;
+import com.example.demo.model.Invoice;
 import com.example.demo.service.InvoiceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
