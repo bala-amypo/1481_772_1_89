@@ -1,39 +1,50 @@
  package com.example.demo.controller;
 
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.RegisterRequest;
+import com.example.demo.model.User;
 import com.example.demo.security.JwtUtil;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import com.example.demo.service.UserService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
+@Tag(name = "Authentication")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(AuthenticationManager authenticationManager,
-                          JwtUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
+    public AuthController(UserService userService, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
         this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @PostMapping("/register")
+    public User register(@RequestBody RegisterRequest request) {
+        User user = new User();
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setRole(request.getRole());
+        return userService.registerUser(user);
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestParam String email,
-                                     @RequestParam String password) {
+    public AuthResponse login(@RequestBody AuthRequest request) {
+        User user = userService.findByEmail(request.getEmail());
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
 
-        String token = jwtUtil.generateToken(email);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-
-        return response;
+        String token = jwtUtil.createToken(user.getId(), user.getEmail(), user.getRole());
+        return new AuthResponse(token, user.getRole(), user.getEmail());
     }
 }
