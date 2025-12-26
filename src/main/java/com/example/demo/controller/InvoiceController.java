@@ -6,12 +6,13 @@ import com.example.demo.service.InvoiceService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoices")
 @Tag(name = "Invoices")
+@SecurityRequirement(name = "bearerAuth")
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
