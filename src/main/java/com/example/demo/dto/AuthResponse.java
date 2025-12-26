@@ -7,10 +7,10 @@ public class AuthResponse {
     private String role;
     private Long userId;
 
-    // ✅ REQUIRED
+     
     public AuthResponse() {}
 
-    // ✅ REQUIRED BY TEST (4-ARG CONSTRUCTOR)
+     
     public AuthResponse(String token, long userId, String email, String role) {
         this.token = token;
         this.userId = userId;
@@ -18,7 +18,7 @@ public class AuthResponse {
         this.role = role;
     }
 
-    // ✅ REQUIRED (OLDER CONSTRUCTOR)
+     
     public AuthResponse(String token, String email, String role) {
         this.token = token;
         this.email = email;
