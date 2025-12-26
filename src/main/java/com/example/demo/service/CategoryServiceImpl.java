@@ -1,19 +1,18 @@
  package com.example.demo.service.impl;
 
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.Category;
+import com.example.demo.entity.Category;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.service.CategoryService;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    // Constructor Injection ONLY
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
@@ -24,14 +23,26 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category getCategory(Long id) {
+    public Category getCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
     @Override
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    @Override
+    public Category updateCategory(Long id, Category category) {
+        Category existing = getCategoryById(id);
+        existing.setName(category.getName());
+        existing.setDescription(category.getDescription());
+        return categoryRepository.save(existing);
+    }
+
+    @Override
+    public void deleteCategory(Long id) {
+        categoryRepository.deleteById(id);
     }
 }
