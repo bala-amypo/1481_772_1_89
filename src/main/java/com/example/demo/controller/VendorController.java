@@ -4,6 +4,7 @@ import com.example.demo.entity.Vendor;
 import com.example.demo.service.VendorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -12,33 +13,33 @@ public class VendorController {
 
     private final VendorService vendorService;
 
-    public VendorController(VendorService vendorService) {
+    public VendorController(VendorService vendorService){
         this.vendorService = vendorService;
     }
 
     @PostMapping
-    public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendor) {
+    public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendor){
         return ResponseEntity.ok(vendorService.createVendor(vendor));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Vendor> getVendor(@PathVariable Long id) {
-        return ResponseEntity.ok(vendorService.getVendorById(id));
-    }
-
     @GetMapping
-    public ResponseEntity<List<Vendor>> getAllVendors() {
+    public ResponseEntity<List<Vendor>> getAllVendors(){
         return ResponseEntity.ok(vendorService.getAllVendors());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Vendor> getVendorById(@PathVariable Long id){
+        return ResponseEntity.ok(vendorService.getVendorById(id));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Vendor> updateVendor(@PathVariable Long id, @RequestBody Vendor vendor) {
+    public ResponseEntity<Vendor> updateVendor(@PathVariable Long id, @RequestBody Vendor vendor){
         return ResponseEntity.ok(vendorService.updateVendor(id, vendor));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVendor(@PathVariable Long id) {
+    public ResponseEntity<String> deleteVendor(@PathVariable Long id){
         vendorService.deleteVendor(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Vendor deleted successfully");
     }
 }
