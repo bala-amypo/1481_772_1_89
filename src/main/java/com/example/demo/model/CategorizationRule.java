@@ -1,6 +1,8 @@
- package com.example.demo.model;
+ package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,21 +13,30 @@ public class CategorizationRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ruleType;   // EXACT, CONTAINS, REGEX
-    private String pattern;
-    private Integer priority;
-    private String description;
-    private String keyword;
-    private String matchType;
+    @NotBlank
+    @Column(length = 100)
+    private String type; // EXACT, CONTAINS, REGEX
 
-    // ✅ REQUIRED RELATION (FIXES ERROR 3)
+    @NotBlank
+    @Column(length = 500)
+    private String pattern;
+
+    @NotNull
+    private Integer priority;
+
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     private LocalDateTime createdAt;
 
-    public CategorizationRule() {
+    public CategorizationRule() {}
+
+    public CategorizationRule(String type, String pattern, Integer priority, Category category) {
+        this.type = type;
+        this.pattern = pattern;
+        this.priority = priority;
+        this.category = category;
     }
 
     @PrePersist
@@ -33,74 +44,17 @@ public class CategorizationRule {
         this.createdAt = LocalDateTime.now();
     }
 
-    // ---------- Getters & Setters ----------
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getRuleType() {
-        return ruleType;
-    }
-
-    public void setRuleType(String ruleType) {
-        this.ruleType = ruleType;
-    }
-
-    public String getPattern() {
-        return pattern;
-    }
-
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
-
-    public String getMatchType() {
-        return matchType;
-    }
-
-    public void setMatchType(String matchType) {
-        this.matchType = matchType;
-    }
-
-    // ✅ THIS FIXES ERROR 3
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+    public String getPattern() { return pattern; }
+    public void setPattern(String pattern) { this.pattern = pattern; }
+    public Integer getPriority() { return priority; }
+    public void setPriority(Integer priority) { this.priority = priority; }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

@@ -1,13 +1,14 @@
- package com.example.demo.model;
+ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "invoices")
+@Table(name = "invoices", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"invoice_number", "vendor_id"})
+})
 public class Invoice {
 
     @Id
@@ -15,34 +16,59 @@ public class Invoice {
     private Long id;
 
     @NotBlank
-    private String description;
+    @Column(name = "invoice_number", length = 100)
+    private String invoiceNumber;
 
-    private LocalDate invoiceDate;
+    @NotNull
+    private Double amount;
+
+    private LocalDateTime uploadedAt;
 
     @ManyToOne
-    @JoinColumn(name = "uploaded_by")
+    @JoinColumn(name = "uploaded_by", nullable = false)
     private User uploadedBy;
 
     @ManyToOne
-    @JoinColumn(name = "vendor_id")
+    @JoinColumn(name = "vendor_id", nullable = false)
     private Vendor vendor;
 
-    private LocalDateTime uploadedAt;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @Column(length = 50)
+    private String status = "PENDING";
+
+    public Invoice() {}
+
+    public Invoice(String invoiceNumber, Double amount, User uploadedBy, Vendor vendor) {
+        this.invoiceNumber = invoiceNumber;
+        this.amount = amount;
+        this.uploadedBy = uploadedBy;
+        this.vendor = vendor;
+    }
 
     @PrePersist
     public void prePersist() {
         this.uploadedAt = LocalDateTime.now();
+        if(this.status == null) this.status = "PENDING";
     }
 
-    // Getters & Setters
+    // Getters and Setters
     public Long getId() { return id; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public LocalDate getInvoiceDate() { return invoiceDate; }
-    public void setInvoiceDate(LocalDate invoiceDate) { this.invoiceDate = invoiceDate; }
+    public void setId(Long id) { this.id = id; }
+    public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
+    public Double getAmount() { return amount; }
+    public void setAmount(Double amount) { this.amount = amount; }
+    public LocalDateTime getUploadedAt() { return uploadedAt; }
+    public void setUploadedAt(LocalDateTime uploadedAt) { this.uploadedAt = uploadedAt; }
     public User getUploadedBy() { return uploadedBy; }
     public void setUploadedBy(User uploadedBy) { this.uploadedBy = uploadedBy; }
     public Vendor getVendor() { return vendor; }
     public void setVendor(Vendor vendor) { this.vendor = vendor; }
-    public LocalDateTime getUploadedAt() { return uploadedAt; }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

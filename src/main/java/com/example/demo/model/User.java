@@ -1,4 +1,4 @@
- package com.example.demo.model;
+ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -16,37 +16,65 @@ public class User {
     private Long id;
 
     @NotBlank
+    @Column(length = 100)
     private String fullName;
 
     @Email
     @NotBlank
-    @Column(unique = true)
+    @Column(unique = true, length = 100)
     private String email;
 
     @NotBlank
+    @Column(length = 255)
     private String password;
 
     @NotBlank
-    private String role;
+    @Column(length = 10)
+    private String role = "USER";
 
     private LocalDateTime createdAt;
 
     @ManyToMany
     @JoinTable(
-            name = "user_vendor_favorites",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "vendor_id")
+        name = "user_vendor_favorites",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "vendor_id")
     )
     private Set<Vendor> favoriteVendors = new HashSet<>();
 
-    @OneToMany(mappedBy = "uploadedBy")
+    @OneToMany(mappedBy = "uploadedBy", cascade = CascadeType.ALL)
     private Set<Invoice> invoices = new HashSet<>();
+
+    public User() {}
+
+    public User(String fullName, String email, String password, String role) {
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (this.role == null) this.role = "USER";
+        if(this.role == null) this.role = "USER";
     }
 
     // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Set<Vendor> getFavoriteVendors() { return favoriteVendors; }
+    public void setFavoriteVendors(Set<Vendor> favoriteVendors) { this.favoriteVendors = favoriteVendors; }
+    public Set<Invoice> getInvoices() { return invoices; }
+    public void setInvoices(Set<Invoice> invoices) { this.invoices = invoices; }
 }
