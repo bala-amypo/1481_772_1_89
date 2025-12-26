@@ -1,10 +1,12 @@
  package com.example.demo.service;
 
-import com.example.demo.model.Invoice;
-
+import com.example.demo.entity.Invoice;
 import java.util.List;
 
 public interface InvoiceService {
-    Invoice saveInvoice(Invoice invoice);
-    List<Invoice> getInvoicesByUserId(Long userId);
+    Invoice createInvoice(Invoice invoice);
+    Invoice getInvoiceById(Long id);
+    List<Invoice> getAllInvoices();
+    Invoice updateInvoice(Long id, Invoice invoice);
+    void deleteInvoice(Long id);
 }

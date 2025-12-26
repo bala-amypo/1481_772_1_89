@@ -1,37 +1,44 @@
  package com.example.demo.controller;
 
-import com.example.demo.model.CategorizationRule;
+import com.example.demo.entity.CategorizationRule;
 import com.example.demo.service.CategorizationRuleService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
- 
- 
- @RestController
+
+@RestController
 @RequestMapping("/api/rules")
-@Tag(name = "Categorization Rules Endpoints")
 public class CategorizationRuleController {
 
-    private final CategorizationRuleService service;
+    private final CategorizationRuleService ruleService;
 
-    public CategorizationRuleController(CategorizationRuleService service) {
-        this.service = service;
+    public CategorizationRuleController(CategorizationRuleService ruleService) {
+        this.ruleService = ruleService;
     }
 
-    @PostMapping("/category/{id}")
-    public CategorizationRule create(@PathVariable Long id,
-                                     @RequestBody CategorizationRule rule) {
-        return service.createRule(id, rule);
+    @PostMapping
+    public ResponseEntity<CategorizationRule> createRule(@RequestBody CategorizationRule rule) {
+        return ResponseEntity.ok(ruleService.createRule(rule));
     }
 
-    @GetMapping("/category/{id}")
-    public List<CategorizationRule> list(@PathVariable Long id) {
-        return service.getRulesByCategory(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<CategorizationRule> getRule(@PathVariable Long id) {
+        return ResponseEntity.ok(ruleService.getRuleById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CategorizationRule>> getAllRules() {
+        return ResponseEntity.ok(ruleService.getAllRules());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategorizationRule> updateRule(@PathVariable Long id, @RequestBody CategorizationRule rule) {
+        return ResponseEntity.ok(ruleService.updateRule(id, rule));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.deleteRule(id);
+    public ResponseEntity<Void> deleteRule(@PathVariable Long id) {
+        ruleService.deleteRule(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,10 +1,9 @@
  package com.example.demo.controller;
 
-import com.example.demo.model.Invoice;
+import com.example.demo.entity.Invoice;
 import com.example.demo.service.InvoiceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -19,13 +18,27 @@ public class InvoiceController {
 
     @PostMapping
     public ResponseEntity<Invoice> createInvoice(@RequestBody Invoice invoice) {
-        Invoice saved = invoiceService.saveInvoice(invoice);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(invoiceService.createInvoice(invoice));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Invoice>> getInvoicesByUser(@PathVariable Long userId) {
-        List<Invoice> invoices = invoiceService.getInvoicesByUserId(userId);
-        return ResponseEntity.ok(invoices);
+    @GetMapping("/{id}")
+    public ResponseEntity<Invoice> getInvoice(@PathVariable Long id) {
+        return ResponseEntity.ok(invoiceService.getInvoiceById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Invoice>> getAllInvoices() {
+        return ResponseEntity.ok(invoiceService.getAllInvoices());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Invoice> updateInvoice(@PathVariable Long id, @RequestBody Invoice invoice) {
+        return ResponseEntity.ok(invoiceService.updateInvoice(id, invoice));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInvoice(@PathVariable Long id) {
+        invoiceService.deleteInvoice(id);
+        return ResponseEntity.noContent().build();
     }
 }
