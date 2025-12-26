@@ -1,36 +1,44 @@
-package com.example.demo.controller;
+ package com.example.demo.controller;
 
-import com.example.demo.model.Category;
+import com.example.demo.entity.Category;
 import com.example.demo.service.CategoryService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-
- @RestController
+@RestController
 @RequestMapping("/api/categories")
-@Tag(name = "Categories Endpoints")
 public class CategoryController {
 
-    private final CategoryService service;
+    private final CategoryService categoryService;
 
-    public CategoryController(CategoryService service) {
-        this.service = service;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @PostMapping
-    public Category create(@RequestBody Category c) {
-        return service.createCategory(c);
-    }
-
-    @GetMapping
-    public List<Category> all() {
-        return service.getAllCategories();
+    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
+        return ResponseEntity.ok(categoryService.createCategory(category));
     }
 
     @GetMapping("/{id}")
-    public Category get(@PathVariable Long id) {
-        return service.getCategory(id);
+    public ResponseEntity<Category> getCategory(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Category>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, category));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }
