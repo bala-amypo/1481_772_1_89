@@ -11,7 +11,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,41 +24,44 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private UserDetailsService userDetailsService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
 
-        // Authenticate
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
         );
 
-        // Load user
-        User user = userService.findByEmail(request.getEmail());
-
-        // Ensure principal is cast to UserDetails safely
-        UserDetails userDetails;
-        if (authentication.getPrincipal() instanceof UserDetails) {
-            userDetails = (UserDetails) authentication.getPrincipal();
-        } else {
-            throw new RuntimeException("Authentication principal is not UserDetails");
+        Optional<User> optionalUser = userService.findByEmail(request.getEmail());
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
         }
 
-        // Generate JWT token
+        User user = optionalUser.get();
+
+        // ✅ IMPORTANT FIX
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(user.getEmail());
+
         String token = jwtUtil.generateToken(userDetails, user);
 
-        // Prepare response
         AuthResponse response = new AuthResponse(
                 token,
                 user.getId(),
-                user.getFullName(),
+                user.getEmail(),
                 user.getRole()
         );
 
         return ResponseEntity.ok(response);
     }
-} // <-- Make sure this closing brace is present
+}
