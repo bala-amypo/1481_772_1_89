@@ -1,67 +1,39 @@
  package com.example.demo.controller;
 
-import com.example.demo.dto.AuthRequest;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.model.User;
 import com.example.demo.security.JwtUtil;
-import com.example.demo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
+    public AuthController(AuthenticationManager authenticationManager,
+                          JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    public Map<String, String> login(@RequestParam String email,
+                                     @RequestParam String password) {
 
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
+                new UsernamePasswordAuthenticationToken(email, password)
         );
 
-        Optional<User> optionalUser = userService.findByEmail(request.getEmail());
-        if (optionalUser.isEmpty()) {
-            throw new RuntimeException("User not found");
-        }
+        String token = jwtUtil.generateToken(email);
 
-        User user = optionalUser.get();
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
 
-        // ✅ IMPORTANT FIX
-        UserDetails userDetails =
-                userDetailsService.loadUserByUsername(user.getEmail());
-
-        String token = jwtUtil.generateToken(userDetails, user);
-
-        AuthResponse response = new AuthResponse(
-                token,
-                user.getId(),
-                user.getEmail(),
-                user.getRole()
-        );
-
-        return ResponseEntity.ok(response);
+        return response;
     }
 }
