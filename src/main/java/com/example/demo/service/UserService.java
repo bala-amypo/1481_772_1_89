@@ -1,12 +1,12 @@
  package com.example.demo.service;
 
-import com.example.demo.model.User;
-
-import java.util.Optional;
+import com.example.demo.entity.User;
+import java.util.List;
 
 public interface UserService {
-
-    Optional<User> findByEmail(String email);
-
-    User save(User user);
+    User createUser(User user);
+    User getUserById(Long id);
+    List<User> getAllUsers();
+    User updateUser(Long id, User user);
+    void deleteUser(Long id);
 }
