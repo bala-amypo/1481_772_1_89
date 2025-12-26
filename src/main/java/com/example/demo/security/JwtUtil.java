@@ -8,47 +8,36 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String jwtSecret = "YourSuperSecretKeyWhichIsVeryLong12345";
-    private final long jwtExpirationMs = 86400000; // 24 hours
+    private final String SECRET_KEY = "invoice_secret_key_123";
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
-    public String generateToken(String email, String role, Long userId) {
+    public String generateToken(String username) {
+
         return Jwts.builder()
-                .setSubject(email)
-                .claim("role", role)
-                .claim("userId", userId)
+                .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
+    }
+
+    public String extractUsername(String token) {
+        return getClaims(token).getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            getClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public String getEmailFromToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret)
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public String getRoleFromToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role", String.class);
-    }
-
-    public Long getUserIdFromToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("userId", Long.class);
+                .getBody();
     }
 }
