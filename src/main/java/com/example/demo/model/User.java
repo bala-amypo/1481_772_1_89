@@ -1,31 +1,44 @@
  package com.example.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Full name is required")
     private String fullName;
 
-    @NotBlank
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    // Add role
-    @NotBlank
-    private String role;
+    @ManyToOne
+    @JoinColumn(name = "vendor_id")
+    private Vendor vendor;
 
-    // getters and setters
+    // Constructors
+    public User() {}
 
+    public User(String fullName, String email, String password, Vendor vendor) {
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.vendor = vendor;
+    }
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -58,12 +71,11 @@ public class User {
         this.password = password;
     }
 
-    // ✅ Role getter and setter
-    public String getRole() {
-        return role;
+    public Vendor getVendor() {
+        return vendor;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 }

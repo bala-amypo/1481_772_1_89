@@ -13,22 +13,52 @@ public class Vendor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Vendor name is required")
     private String name;
 
-    @ManyToMany(mappedBy = "favoriteVendors")
+    @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<User> users = new HashSet<>();
 
-    public Vendor() {
+    // Constructors
+    public Vendor() {}
+
+    public Vendor(String name) {
+        this.name = name;
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public Set<User> getUsers() { return users; }
-    public void setUsers(Set<User> users) { this.users = users; }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
+    }
+
+    // Convenience methods for bi-directional relationship
+    public void addUser(User user) {
+        users.add(user);
+        user.setVendor(this);
+    }
+
+    public void removeUser(User user) {
+        users.remove(user);
+        user.setVendor(null);
+    }
 }
