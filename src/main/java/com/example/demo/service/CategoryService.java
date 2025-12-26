@@ -1,12 +1,39 @@
  package com.example.demo.service;
 
 import com.example.demo.entity.Category;
+import com.example.demo.repository.CategoryRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
-public interface CategoryService {
-    Category createCategory(Category category);
-    Category getCategoryById(Long id);
-    List<Category> getAllCategories();
-    Category updateCategory(Long id, Category category);
-    void deleteCategory(Long id);
+@Service
+public class CategoryService {
+
+    private final CategoryRepository categoryRepository;
+
+    public CategoryService(CategoryRepository categoryRepository){
+        this.categoryRepository = categoryRepository;
+    }
+
+    public Category createCategory(Category category){
+        return categoryRepository.save(category);
+    }
+
+    public List<Category> getAllCategories(){
+        return categoryRepository.findAll();
+    }
+
+    public Category getCategoryById(Long id){
+        return categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+    }
+
+    public Category updateCategory(Long id, Category updatedCategory){
+        Category category = getCategoryById(id);
+        category.setName(updatedCategory.getName());
+        return categoryRepository.save(category);
+    }
+
+    public void deleteCategory(Long id){
+        categoryRepository.deleteById(id);
+    }
 }
