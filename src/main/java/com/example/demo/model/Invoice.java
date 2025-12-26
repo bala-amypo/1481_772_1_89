@@ -1,6 +1,10 @@
  package com.example.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invoices")
@@ -10,55 +14,35 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String invoiceNumber;
+    @NotBlank
+    private String description;
 
-    @Column(nullable = false)
-    private Double amount;
+    private LocalDate invoiceDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")  // Foreign key to User
-    private User user;
+    @JoinColumn(name = "uploaded_by")
+    private User uploadedBy;
 
-    // Constructors
-    public Invoice() {}
+    @ManyToOne
+    @JoinColumn(name = "vendor_id")
+    private Vendor vendor;
 
-    public Invoice(String invoiceNumber, Double amount, User user) {
-        this.invoiceNumber = invoiceNumber;
-        this.amount = amount;
-        this.user = user;
+    private LocalDateTime uploadedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.uploadedAt = LocalDateTime.now();
     }
 
     // Getters & Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getInvoiceNumber() {
-        return invoiceNumber;
-    }
-
-    public void setInvoiceNumber(String invoiceNumber) {
-        this.invoiceNumber = invoiceNumber;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public Long getId() { return id; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public LocalDate getInvoiceDate() { return invoiceDate; }
+    public void setInvoiceDate(LocalDate invoiceDate) { this.invoiceDate = invoiceDate; }
+    public User getUploadedBy() { return uploadedBy; }
+    public void setUploadedBy(User uploadedBy) { this.uploadedBy = uploadedBy; }
+    public Vendor getVendor() { return vendor; }
+    public void setVendor(Vendor vendor) { this.vendor = vendor; }
+    public LocalDateTime getUploadedAt() { return uploadedAt; }
 }

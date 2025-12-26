@@ -3,7 +3,10 @@
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
@@ -20,57 +23,28 @@ public class User {
     @NotBlank
     private String email;
 
-    @NotBlank
-    private String role;
+    @ManyToMany
+    @JoinTable(
+        name = "user_favorite_vendors",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "vendor_id")
+    )
+    private Set<Vendor> favoriteVendors = new HashSet<>();
 
-    // ✅ REQUIRED FOR SPRING SECURITY
-    @NotBlank
-    @Size(min = 6)
-    private String password;
+    private LocalDateTime createdAt;
 
-    public User() {
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    // ---------- Getters & Setters ----------
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    // ✅ THIS FIXES ERROR 2
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    // Getters & Setters
+    public Long getId() { return id; }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public Set<Vendor> getFavoriteVendors() { return favoriteVendors; }
+    public void setFavoriteVendors(Set<Vendor> favoriteVendors) { this.favoriteVendors = favoriteVendors; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
