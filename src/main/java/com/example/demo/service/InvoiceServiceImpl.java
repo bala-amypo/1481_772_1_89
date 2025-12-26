@@ -2,21 +2,32 @@
 
 import com.example.demo.model.Invoice;
 import com.example.demo.repository.InvoiceRepository;
-import com.example.demo.repository.CategorizationRuleRepository;
-import com.example.demo.util.InvoiceCategorizationEngine;
+import com.example.demo.service.InvoiceService;
+import org.springframework.stereotype.Service;
 
-public class InvoiceServiceImpl {
+import java.util.List;
+
+@Service  // 👈 MUST HAVE @Service annotation
+public class InvoiceServiceImpl implements InvoiceService {
+
     private final InvoiceRepository invoiceRepository;
-    private final CategorizationRuleRepository ruleRepository;
-    private final InvoiceCategorizationEngine engine;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository,
-                              CategorizationRuleRepository ruleRepository,
-                              InvoiceCategorizationEngine engine) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository) {
         this.invoiceRepository = invoiceRepository;
-        this.ruleRepository = ruleRepository;
-        this.engine = engine;
     }
 
-    // Dummy service methods for compilation
+    @Override
+    public Invoice saveInvoice(Invoice invoice) {
+        return invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public List<Invoice> getAllInvoices() {
+        return invoiceRepository.findAll();
+    }
+
+    @Override
+    public Invoice getInvoiceById(Long id) {
+        return invoiceRepository.findById(id).orElse(null);
+    }
 }
