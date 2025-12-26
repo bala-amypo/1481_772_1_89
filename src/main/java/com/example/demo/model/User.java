@@ -24,6 +24,9 @@ public class User {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    @NotBlank(message = "Role is required")
+    private String role;  // <-- Added role field
+
     @ManyToOne
     @JoinColumn(name = "vendor_id")
     private Vendor vendor;
@@ -31,10 +34,11 @@ public class User {
     // Constructors
     public User() {}
 
-    public User(String fullName, String email, String password, Vendor vendor) {
+    public User(String fullName, String email, String password, String role, Vendor vendor) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
+        this.role = role;
         this.vendor = vendor;
     }
 
@@ -69,6 +73,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {   // <-- Getter for role
+        return role;
+    }
+
+    public void setRole(String role) {  // <-- Setter for role
+        this.role = role;
     }
 
     public Vendor getVendor() {
