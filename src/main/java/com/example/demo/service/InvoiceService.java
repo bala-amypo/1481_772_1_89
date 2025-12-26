@@ -1,10 +1,10 @@
  package com.example.demo.service;
 
 import com.example.demo.model.Invoice;
+
 import java.util.List;
 
 public interface InvoiceService {
     Invoice saveInvoice(Invoice invoice);
-    List<Invoice> getAllInvoices();
-    Invoice getInvoiceById(Long id);
+    List<Invoice> getInvoicesByUserId(Long userId);
 }
