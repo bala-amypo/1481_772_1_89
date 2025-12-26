@@ -2,9 +2,11 @@
 
 import com.example.demo.model.User;
 
+import java.util.Optional;
+
 public interface UserService {
 
-    User register(User user);
+    Optional<User> findByEmail(String email);
 
-    User findByEmail(String email);
+    User save(User user);
 }
